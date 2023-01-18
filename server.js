@@ -1,14 +1,14 @@
-'use strict';
+"use strict";
 
-console.log('This is the first server');
+console.log("This is the first server");
 
 // **** REQUIRES ****
-const express = require('express');
-require('dotenv').config();
-const cors = require('cors');
+const express = require("express");
+require("dotenv").config();
+const cors = require("cors");
 
 // *** FOR LAB DON'T FORGET TO REQUIRE YOUR STARTER JSON FILE ***
-let data = require('./data/weather.json');
+let data = require("./data/weather.json");
 
 // **** Once express is in we need to use it - per express docs
 // *** app === server
@@ -18,11 +18,8 @@ const app = express();
 // *** cors is middleware - security guard that allows us to share resources across the internet **
 app.use(cors());
 
-
-
 // *** DEFINE A PORT FOR MY SERVER TO RUN ON ***
 const PORT = process.env.PORT || 3002;
-
 
 // **** ENDPOINTS ****
 
@@ -32,19 +29,20 @@ const PORT = process.env.PORT || 3002;
 
 // *** Callback function - 2 parameters: request, response (req,res)
 
-
-app.get('/weather', (request, response, next) => {
+app.get("/weather", (request, response, next) => {
   try {
-    let {searchQuery} = request.query;
-    console.log(searchQuery);
+    let { searchQuery } = request.query;
+
     // let lat = request.query.lat;
     // let lon = request.query.lon;
 
-    let dataToGroom = data.find((city) => city.city_name === searchQuery);
-    console.log(dataToGroom.data[0].weather.description);
+    let dataToGroom = data.find(
+      (city) =>
+        city.city_name.toLocaleLowerCase() === searchQuery.toLocaleLowerCase()
+    );
+
     // let dataToSend = new Forecast(dataToGroom);
-    let dataToSend = dataToGroom.data.map(day => new Forecast(day));
-    console.log(dataToSend);
+    let dataToSend = dataToGroom.data.map((day) => new Forecast(day));
 
     response.status(200).send(dataToSend);
   } catch (error) {
@@ -61,14 +59,10 @@ class Forecast {
   }
 }
 
-
 // **** CATCH ALL ENDPOINT - NEEDS TO BE YOUR LAST DEFINED ENDPOINT ****
-app.get('*', (request, response) => {
-  response.status(404).send('This page does not exist');
+app.get("*", (request, response) => {
+  response.status(404).send("This page does not exist");
 });
-
-
-
 
 // **** ERROR HANDLING - PLUG AND PLAY CODE FROM EXPRESS DOCS ****
 app.use((error, request, response, next) => {
