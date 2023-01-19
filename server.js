@@ -15,7 +15,7 @@ let data = require("./data/weather.json");
 const app = express();
 
 // **** MIDDLEWARE ****
-// *** cors is middleware - security guard that allows us to share resources across the internet **
+// *** cors is middleware - security guard that allows us to share resources across the internet ***
 app.use(cors());
 
 // *** DEFINE A PORT FOR MY SERVER TO RUN ON ***
