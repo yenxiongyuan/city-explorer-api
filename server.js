@@ -1,28 +1,25 @@
-'use strict';
+"use strict";
 
-console.log('This is the first server');
+console.log("This is the first server");
 
 // **** REQUIRES ****
-const express = require('express');
-require('dotenv').config();
-const cors = require('cors');
+const express = require("express");
+require("dotenv").config();
+const cors = require("cors");
 
 // *** FOR LAB DON'T FORGET TO REQUIRE YOUR STARTER JSON FILE ***
-let data = require('./data/weather.json');
+let data = require("./data/weather.json");
 
 // **** Once express is in we need to use it - per express docs
 // *** app === server
 const app = express();
 
 // **** MIDDLEWARE ****
-// *** cors is middleware - security guard that allows us to share resources across the internet **
+// *** cors is middleware - security guard that allows us to share resources across the internet ***
 app.use(cors());
-
-
 
 // *** DEFINE A PORT FOR MY SERVER TO RUN ON ***
 const PORT = process.env.PORT || 3002;
-
 
 // **** ENDPOINTS ****
 
@@ -32,21 +29,22 @@ const PORT = process.env.PORT || 3002;
 
 // *** Callback function - 2 parameters: request, response (req,res)
 
-
-app.get('/weather', (request, response, next) => {
+app.get("/weather", async (request, response, next) => {
   try {
-    let {searchQuery} = request.query;
-    console.log(searchQuery);
-    // let lat = request.query.lat;
-    // let lon = request.query.lon;
+    // let { searchQuery } = request.query;
 
-    let dataToGroom = data.find((city) => city.city_name === searchQuery);
-    console.log(dataToGroom.data[0].weather.description);
-    // let dataToSend = new Forecast(dataToGroom);
-    let dataToSend = dataToGroom.data.map(day => new Forecast(day));
-    console.log(dataToSend);
+    let lat = request.query.lat;
+    let lon = request.query.lon;
 
-    response.status(200).send(dataToSend);
+    let url = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.REACT_APP_WEATHER_API_KEY}&lat=${lat}&lon=${lon}&days=3&units=I`;
+
+     let weatherFromAxios = await axios.get(url);
+    // console.log(weatherFromAxios);
+    let arrayDays = weatherFromAxios.data.data;
+    let weatherData = arrayDays.map(day => new Forecast(day));
+    // console.log(arrayDays);
+    
+    response.status(200).send(weatherData);
   } catch (error) {
     next(error);
   }
@@ -61,14 +59,10 @@ class Forecast {
   }
 }
 
-
 // **** CATCH ALL ENDPOINT - NEEDS TO BE YOUR LAST DEFINED ENDPOINT ****
-app.get('*', (request, response) => {
-  response.status(404).send('This page does not exist');
+app.get("*", (request, response) => {
+  response.status(404).send("This page does not exist");
 });
-
-
-
 
 // **** ERROR HANDLING - PLUG AND PLAY CODE FROM EXPRESS DOCS ****
 app.use((error, request, response, next) => {
