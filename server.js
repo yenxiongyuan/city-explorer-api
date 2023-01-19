@@ -29,22 +29,22 @@ const PORT = process.env.PORT || 3002;
 
 // *** Callback function - 2 parameters: request, response (req,res)
 
-app.get("/weather", (request, response, next) => {
+app.get("/weather", async (request, response, next) => {
   try {
-    let { searchQuery } = request.query;
+    // let { searchQuery } = request.query;
 
-    // let lat = request.query.lat;
-    // let lon = request.query.lon;
+    let lat = request.query.lat;
+    let lon = request.query.lon;
 
-    let dataToGroom = data.find(
-      (city) =>
-        city.city_name.toLocaleLowerCase() === searchQuery.toLocaleLowerCase()
-    );
+    let url = `http://api.weatherbit.io/v2.0/forecast/daily?key=${process.env.REACT_APP_WEATHER_API_KEY}&lat=${lat}&lon=${lon}&days=3&units=I`;
 
-    // let dataToSend = new Forecast(dataToGroom);
-    let dataToSend = dataToGroom.data.map((day) => new Forecast(day));
-
-    response.status(200).send(dataToSend);
+     let weatherFromAxios = await axios.get(url);
+    // console.log(weatherFromAxios);
+    let arrayDays = weatherFromAxios.data.data;
+    let weatherData = arrayDays.map(day => new Forecast(day));
+    // console.log(arrayDays);
+    
+    response.status(200).send(weatherData);
   } catch (error) {
     next(error);
   }
